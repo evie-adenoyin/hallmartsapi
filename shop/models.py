@@ -23,6 +23,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'Categories'
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -63,6 +64,13 @@ class Color (models.Model):
     
 
 class Product(models.Model):
+    GRADE = (
+        ('thrift', 'thrift'),
+        ('brand new', 'brand new'),
+        ('first grade', 'first grade'),
+        ('second grade', 'second grade'),
+    )
+      
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, null = True, blank = True, related_name='products')
     name = models.CharField(max_length=50)
     price = models.IntegerField(default=0)
@@ -78,7 +86,8 @@ class Product(models.Model):
     second_category= models.ManyToManyField(to=SecondLayerSubCategory, related_name='secondlayercategories')
     description = models.TextField(max_length=500)
     additional_info = models.TextField(max_length=500)
-    shipping = models.CharField(max_length=1000)
+    shipping = models.IntegerField(default=0)
+    grade = models.CharField(max_length=20, choices=GRADE, default='thrift')
     tag = models.CharField(max_length=800)
     rating = models.IntegerField(default=0)
     liked = models.BooleanField(default= False)
@@ -89,67 +98,35 @@ class Product(models.Model):
     date_Created = models.DateTimeField(auto_now_add = timezone.now)
     ordered = models.BooleanField(default= False)
 
+
     
 
 
     class Meta:
         ordering = ['-id']
 
-    @property
-    def display_price(self):
-        if self.discount:
-            discount_price = self.discount*100 
-            percentage = discount_price/self.price
-            new_price = self.price - self.discount
-            self.new_price = new_price
-            self.discount_percentage = round(float(percentage))
-        else:
-            self.new_price =  self.price
-        return int(self.new_price)
-
+ 
     # @property
     # def ordered_products(self):
     #     ordered_product = self.orderproducts.all()
     #     print("ordered_product:", ordered_product)
     #     return ordered_product
 
-
-
-
-
     def save(self, *args, **kwargs):
         vendor = str(slugify(self.vendor))
+        if self.discount:
+            discount_price = self.discount*100 
+            self.new_price = self.price - self.discount
+            self.discount_percentage = round(float(discount_price/self.price))
+        else:
+            self.new_price =  int(self.price)
+            self.discount_percentage = 0
         if self.slug:
             self.slug = f'{slugify(self.slug)}-{vendor}'
         self.slug = f'{slugify(self.name)}-{vendor}'
         return super(Product, self).save(*args, **kwargs)
-
-
-        # image_read = storage.open(self.image_1, "r")
-        # image = Image.open(image_read)
-        # if image.height > 800 or image.width > 600:
-            # size = 200, 200
-        # if self.image_1:
-        #     img = Image.open(self.image_1)
-        #     if img.height > 800 or img.width > 600:
-        #         output_size = img.resize((800, 600))
-        #         output_size.thumbnail((800, 600), Image.LANCZOS )
-        #         output_size.save(self.image_1 ,optimize=True, quality=70)
-        # print( image)
-        # if self.image_1:
-        #     print(self.image_1.name)
-        #     aws_storage = storage.open(self.image_1.name, "r")
-        #     print(aws_storage)
-        #     # img = Image.open(self.image_1)
-        #     # if img.height > 800 or img.width > 600:
-        #     #     output_size = img.resize((800, 600))
-        #     #     output_size.thumbnail((800, 600), Image.LANCZOS )
-        #     #     output_size.save(self.image_1.name ,optimize=True, quality=70)
         super(Product, self).save(*args, **kwargs)
          
-
-    
-
     def __str__(self):
         return self.name
         
@@ -161,10 +138,12 @@ class Order(models.Model):
     date_created = models.DateTimeField(auto_now_add = True)
     date_ordered = models.DateTimeField(auto_now=True, null = True, blank = True)
     completed = models.BooleanField(default = False, null = True, blank = True)
-    transaction_id = models.CharField(null = True, blank = True, max_length = 20)
-    order_token = models.CharField( null = True, blank = True, max_length = 30)
+    in_transit = models.BooleanField(default = False, null = True, blank = True)
+    transaction_id = models.CharField(null = True, blank = True, max_length = 12)
+    order_token = models.CharField( null = True, blank = True, max_length = 30, unique=True)
 
-    
+    class Meta:
+        ordering = ['-id']
     @property
     def total_cost_of_product_in_order(self):
         order_product = self.orders.all()
@@ -176,10 +155,19 @@ class Order(models.Model):
         order_product = self.orders.all()
         total = sum([product.quantity for product in order_product])
         return int(total)  
-
+    @property
+    def total_discount_of_product_in_order(self):
+        order_product = self.orders.all()
+        total = sum([product.product.discount for product in order_product])
+        return int(total)  
+   
+  
     # def save(self,*args, **kwargs):
     #     self.visitor = secrets.token_hex(10)
     #     return super(Order, self).save(*args, **kwargs)
+    def save(self,*args, **kwargs):
+        self.transaction_id = secrets.token_hex(6)
+        return super(Order, self).save(*args, **kwargs)
 
     def __str__(self):
         return f'Order with token {self.order_token}'
@@ -214,6 +202,18 @@ class WishList(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE , null = True, blank = True, related_name='userwishlist')
     products = models.ManyToManyField(Product)
     private  = models.BooleanField(default = False)
+
+
+    @property
+    def new_price_sum_total(self):
+        total_products = self.products.all()
+        total = sum([product.new_price for product in total_products ])
+        return int(total)
+    @property
+    def price_sum_total(self):
+        total_products = self.products.all()
+        total = sum([product.price for product in total_products ])
+        return int(total)
 
     def __str__(self):
         return f'{self.user} wishlist'

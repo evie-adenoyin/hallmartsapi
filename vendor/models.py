@@ -19,6 +19,7 @@ class Vendor(models.Model):
     brand_statement = models.CharField(max_length=1500, null = True, blank = True)
     date_created = models.DateTimeField(auto_now_add = timezone.now)
     slug = models.SlugField(max_length=255, unique = True)
+    on_campus =  models.BooleanField(default = False)
 
 
     @property
@@ -46,5 +47,4 @@ class Vendor(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.brand)
-            super(Vendor,self).save(*args, **kwargs)
-
+        super(Vendor,self).save(*args, **kwargs)

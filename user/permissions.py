@@ -9,6 +9,7 @@ class UserObjectPermission(BasePermission):
 
     
     def has_object_permission(self, request, view, obj):
+       
         # Instance must have an attribute named `owner`.
         if request.method in SAFE_METHODS and obj.user == request.user:
             return True

@@ -14,6 +14,10 @@ class VendorCreateUpdateSerializer(ModelSerializer):
         fields = ['email','vendor','brand','university','category', 'graduate']
 
 
+class VendorListSerializer(ModelSerializer):
+    class Meta:
+        model= Vendor
+        fields = ['id','brand', 'university']
 # {
 #     "email":"guonnie@gmail.com",
 #     "vendor":"Odokuma",
@@ -28,4 +32,3 @@ class VendorDashboardSerializer(ModelSerializer):
     class Meta:
         model = Vendor
         fields = ['user','vendor','email','university','brand','total_stock','expected_revenue','current_sale','products',]
-

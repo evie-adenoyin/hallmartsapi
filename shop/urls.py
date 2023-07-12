@@ -2,6 +2,7 @@ from django.urls import path, re_path
 from .views import (
  ProductListAPIView,
  ProductDetailAPIView,
+ ProductSearchAPIView,
  CartUpdateAPIView,
  NavbarCategoryAPIView,
  WishListSearchAPIView,
@@ -17,6 +18,7 @@ urlpatterns = [
 
    # Product info endpoints
    path('products', ProductListAPIView.as_view(), name='product-list'),
+   path('products/search', ProductSearchAPIView.as_view(), name='product-search'),
    path('product/<str:slug>', ProductDetailAPIView.as_view(), name='product-detail'),
 
    # Cart action endpoints 

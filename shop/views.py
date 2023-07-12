@@ -13,7 +13,7 @@ from rest_framework.generics import (
     # GenericAPIView
 ) 
 from rest_framework.views import APIView
-from rest_framework import status 
+from rest_framework import status, filters
 from rest_framework.viewsets import ViewSet
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -62,7 +62,11 @@ class ProductListAPIView(ListAPIView):
     filterset_class = ProductFilter
     pagination_class = ProductListLimitOffsetPagination
    
-
+class ProductSearchAPIView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializers
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name',"price", "tag",  "product_size__size","product_color__color", "category__name", "first_category__name","second_category__name",'vendor__university', 'vendor__vendor']
 
 class ProductDetailAPIView(RetrieveAPIView):
     queryset = Product.objects.all()
@@ -175,7 +179,3 @@ class WishListSearchAPIView(APIView):
        
 
         
-
-
-
-

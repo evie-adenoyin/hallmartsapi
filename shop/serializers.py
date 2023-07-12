@@ -95,7 +95,8 @@ class ProductSerializers(ModelSerializer):
     comments = CommentSerializer(read_only = True, many= True)
     class Meta:
         model = Product
-        fields = ['vendor','id','slug','detail_link','name','price','discount','display_price','stock','image_1','image_2','image_3','product_size','product_color','category','first_category','second_category','description','additional_info','shipping','tag','rating','liked','comments']
+        fields = ['vendor','id','name','slug','detail_link','price','discount','grade',
+                  'discount_percentage','new_price','stock','image_1','image_2','image_3','product_size','product_color','category','first_category','second_category','description','additional_info','shipping','tag','rating','liked','comments']
 
 
 
@@ -106,7 +107,7 @@ class OrderProductSerializer(ModelSerializer):
     product = ProductSerializers(read_only=True)
     class Meta:
         model = OrderProduct
-        fields =['id','product', 'quantity', 'total_cost_of_product', 'color', 'size']
+        fields =['id','product', 'quantity', 'total_cost_of_product', 'color', 'size', ]
 
 
 class OrderSerializer(ModelSerializer):
@@ -114,7 +115,7 @@ class OrderSerializer(ModelSerializer):
     orders = OrderProductSerializer(many=True, read_only=True)
     class Meta:
         model = Order
-        fields = ['id','order_token','user', 'completed','total_quantity_of_product_in_order', 'total_cost_of_product_in_order', 'orders']
+        fields = ['id','transaction_id','order_token','user','in_transit', 'completed','total_quantity_of_product_in_order','date_created', 'total_cost_of_product_in_order','total_discount_of_product_in_order', 'orders','date_ordered' ]
   
 
 
@@ -124,10 +125,4 @@ class WishListSerializer(ModelSerializer):
     user = CharField(max_length=2000, read_only = True)
     class Meta:
         model = WishList
-        fields = ['code','user','products']
-
-
-
-
-
-
+        fields = ['code','user','products', 'new_price_sum_total','price_sum_total','private']

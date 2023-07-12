@@ -10,12 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 # from django.conf import settings
-# from django.db.models.signals import post_save
+from django.db.models.signals import post_save
 
-# def post_save_receiver(sender, instance, created, **kwargs):
-#     pass
-
-# post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
 
 class CustomUSerManager(BaseUserManager):
@@ -60,13 +56,15 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True, blank=True, null = True)
     university = models.CharField(max_length=25, unique=False, default='university', blank=True, null = True)
     reg_no = models.CharField(_('Registration number'),max_length=25, unique=True, default='000000', blank=True, null = True)
-    # vendor = models.BooleanField(default = False)
+    vendor_role = models.BooleanField(default = False)
     username = models.CharField(max_length = 150, unique = False)
+    first_name = models.CharField(max_length = 50, unique = False)
+    last_name = models.CharField(max_length = 50, unique = False)
     
     
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS=  ['username','reg_no']
+    REQUIRED_FIELDS=  ['username','reg_no', 'university']
 
     objects =  CustomUSerManager()
 
@@ -81,6 +79,12 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.email}'s profile"
+
+# def post_save_receiver(sender, instance, created, **kwargs):
+#     if created:
+#         instance.
+
+# post_save.connect(post_save_receiver, sender=User)
 
 
 

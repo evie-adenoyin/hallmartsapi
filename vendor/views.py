@@ -8,11 +8,17 @@ from rest_framework.response import Response
 # ) 
 from rest_framework import status
 from rest_framework.views import APIView
-
+from rest_framework.generics import (
+    ListAPIView,
+    RetrieveAPIView,
+    # RetrieveUpdateAPIView,
+    # UpdateAPIView,
+    # GenericAPIView
+) 
 from shop.serializers import ProductSerializers, OrderProductSerializer
 from shop.models import OrderProduct, Order, Product
 from .models import Vendor
-from .serializers import VendorDashboardSerializer, VendorCreateUpdateSerializer
+from .serializers import VendorDashboardSerializer, VendorCreateUpdateSerializer, VendorListSerializer
 from .emailServer import VendorRegistrationEmail
 
 
@@ -30,7 +36,11 @@ class VendorCreateApiView(APIView):
             return Response({"message":"You have been added to our waitlist!"}, status = status.HTTP_201_CREATED)     
         return Response(serializer.errors)
 
+class VendorListApiView(ListAPIView):
+    queryset = Vendor.objects.all()
+    serializer_class = VendorListSerializer
 
+    
 class VendorDashboardApiView(APIView):
 
     def get(self,request):
@@ -66,5 +76,3 @@ class VendorOrderApiView(APIView):
     #         serializer.save()
     #         return Response(serializer.data, status = status.HTTP_200_OK )
     #     return Response(serializer.error, status = status.HTTP_403_FORBBIDEN)
-
-

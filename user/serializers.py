@@ -1,11 +1,11 @@
 from dataclasses import fields
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, StringRelatedField, IntegerField
 
 
-from  .models import User, UserAddress, UserProfile
-
+from shop.models import Order
 from shop.serializers import OrderSerializer, WishListSerializer
 
+from  .models import User, UserAddress, UserProfile
 # User Serializers 
 
 class UserRegistrationSerializer(ModelSerializer):
@@ -32,7 +32,7 @@ class UserSerializer(ModelSerializer):
     userwishlist = WishListSerializer()
     class Meta:
         model = User
-        fields = ['id','email', 'university', 'reg_no', 'userorder', 'userwishlist']
+        fields = ['id','email', 'university', 'reg_no', 'userorder', 'userwishlist','vendor_role','username','first_name','last_name']
 
 
 class UserAddressSerializer(ModelSerializer):
@@ -49,3 +49,9 @@ class UserProfileSerializer(ModelSerializer):
         fields = ['user', 'address']
 
 
+class UserOrderAnalyticsSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id','user' ]
+        # fields = ['id','total_orders','order_token','user', 'completed','userorder' ]
+  
