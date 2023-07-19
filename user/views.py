@@ -39,10 +39,16 @@ class UserRegistrationApiView(APIView):
 
     def post(self, request):
         data = request.data
+        
         serializer = UserRegistrationSerializer(data = data)
+      
         if serializer.is_valid():
             serializer.save()
+            print("serializer: ", serializer.validated_data)
             return Response(serializer.data, status =status.HTTP_201_CREATED)
+        else:
+            print("serializer: ", serializer)
+            print("Didn't save user")
         return Response(serializer.errors)
 
 

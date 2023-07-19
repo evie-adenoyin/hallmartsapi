@@ -15,15 +15,16 @@ class UserRegistrationSerializer(ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        
         user = User(
             email=validated_data['email'],
             username=validated_data['username'],
-            university = validated_data['username'],
+            university = validated_data['university'],
             reg_no = validated_data['reg_no'],
         )
+        
         user.set_password(validated_data['password'])
         user.save()
-
         return user
 
 
