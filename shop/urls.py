@@ -3,10 +3,12 @@ from .views import (
  ProductListAPIView,
  ProductDetailAPIView,
  ProductSearchAPIView,
- CartUpdateAPIView,
+ CartAPIView,
  NavbarCategoryAPIView,
- WishListSearchAPIView,
- AddToCartDetailPageViewSet
+ WishListAPIView,
+ AddToCartDetailPageViewSet,
+ AddressAPIView,
+ CartTotalAPIView
 )
 
 app_name = 'shop'
@@ -23,8 +25,12 @@ urlpatterns = [
 
    # Cart action endpoints 
    path('add/to/cart/details', AddToCartDetailPageViewSet.as_view(), name='add-to-cart'),
-   path('cart/<str:token>', CartUpdateAPIView.as_view(), name='cart-update'),
+   path('cart', CartAPIView.as_view(), name='cart-update'),
+   path('cart/total', CartTotalAPIView.as_view(), name='cart-total'),
 
    # Wishlist endpoint 
-   path('wishlist/<str:code>', WishListSearchAPIView.as_view(), name='wishlist'),
+   path('wishlist', WishListAPIView.as_view(), name='wishlist'),
+
+   #Address endpoint
+   path('user/address', AddressAPIView.as_view(), name='address')
 ]

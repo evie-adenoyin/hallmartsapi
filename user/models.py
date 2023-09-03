@@ -53,9 +53,9 @@ class CustomUSerManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    email = models.EmailField(_('email address'), unique=True, blank=True, null = True)
-    university = models.CharField(max_length=25, unique=False, default='university', blank=True, null = True)
-    reg_no = models.CharField(_('Registration number'),max_length=25, unique=True, default='000000', blank=True, null = True)
+    email = models.EmailField(_('email address'), unique=True, blank=False, null = False, default='email@hallmarts.com')
+    university = models.CharField(max_length=100, unique=False, default='university', blank=True, null = True)
+    reg_no = models.CharField(_('Registration number'),max_length=25, unique=True, default='000000', blank=False, null = False)
     vendor_role = models.BooleanField(default = False)
     username = models.CharField(max_length = 150, unique = False)
     first_name = models.CharField(max_length = 50, unique = False)
@@ -74,29 +74,31 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user  = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
-    address  = models.OneToOneField('UserAddress', on_delete=models.CASCADE, related_name='address')
     bio = models.CharField(max_length=2000, unique=False, blank=True, null = True)
 
     def __str__(self):
         return f"{self.user.email}'s profile"
 
-# def post_save_receiver(sender, instance, created, **kwargs):
-#     if created:
-#         instance.
+def post_save_receiver(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user = instance)
+  
 
-# post_save.connect(post_save_receiver, sender=User)
+post_save.connect(post_save_receiver, sender=User)
 
 
 
 class UserAddress(models.Model):
-    user  = models.OneToOneField(User, on_delete=models.CASCADE)
-    city  = models.CharField(max_length=200, unique=False)
-    state  = models.CharField(max_length=200, unique=False)
+    user  = models.OneToOneField(UserProfile, on_delete=models.CASCADE,  related_name='address')
+    home = models.CharField(max_length=1000, unique=False, null=True, blank=True)
+    city  = models.CharField(max_length=200, unique=False, null=True, blank=True)
+    state  = models.CharField(max_length=200, unique=False, null=True, blank=True)
     country = CountryField(multiple = False)
+    phone = models.CharField(max_length=15, unique=False, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = 'User Address'
 
     
     def __str__(self):
-        return f'Address of  {self.user.email}'
+        return f'Address of  {self.user.user.email}'

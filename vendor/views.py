@@ -26,13 +26,13 @@ class VendorCreateApiView(APIView):
     
     def post(self, request):
         data = request.data
-        print(data)
+     
         serializer = VendorCreateUpdateSerializer(data=data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             if serializer.validated_data['graduate']=="True" or serializer.validated_data['graduate']=="true":
                 serializer(graduate = True)
             serializer.save()
-            VendorRegistrationEmail(email = serializer.data['email'],vendor =serializer.data['vendor'],brand = serializer.data['brand'])
+            # VendorRegistrationEmail(email = serializer.data['email'],vendor =serializer.data['vendor'],brand = serializer.data['brand'])
             return Response({"message":"You have been added to our waitlist!"}, status = status.HTTP_201_CREATED)     
         return Response(serializer.errors)
 

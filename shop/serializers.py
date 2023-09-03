@@ -24,7 +24,9 @@ from .models import (
     SecondLayerSubCategory,
     WishList,
     Size,
-    Color
+    Color,
+    Address,
+    ShippingAddress
     )
 
 
@@ -37,7 +39,6 @@ class VendorSerializer(ModelSerializer):
 
 
 # Category API Serializer
-
 class ProductSizeSerializer(ModelSerializer):
     class Meta:
         model = Size
@@ -64,9 +65,7 @@ class CategorySerializer(ModelSerializer):
        model = Category
        fields = ['id','name']
 
-
 # Navbar API serializer
-
 class SubCategorySerializer(ModelSerializer):
     secondlayercategories = SecondLayerCategorySerializer(many = True, read_only = True)
     class Meta:
@@ -79,11 +78,8 @@ class NavbarCategorySerializer(ModelSerializer):
         model = Category
         fields = ['id','name', 'firstlayercategories']
    
-
 # Product API Serializer 
-
 # product comment API Serializer
-
 class ProductSerializers(ModelSerializer):
     detail_link = HyperlinkedIdentityField(view_name='shop:product-detail', lookup_field = 'slug')
     category = CategorySerializer(many=True,read_only=True)
@@ -97,9 +93,6 @@ class ProductSerializers(ModelSerializer):
         model = Product
         fields = ['vendor','id','name','slug','detail_link','price','discount','grade',
                   'discount_percentage','new_price','stock','image_1','image_2','image_3','product_size','product_color','category','first_category','second_category','description','additional_info','shipping','tag','rating','liked','comments']
-
-
-
 
 # Order Products API Serializer 
 
@@ -117,8 +110,10 @@ class OrderSerializer(ModelSerializer):
         model = Order
         fields = ['id','transaction_id','order_token','user','in_transit', 'completed','total_quantity_of_product_in_order','date_created', 'total_cost_of_product_in_order','total_discount_of_product_in_order', 'orders','date_ordered' ]
   
-
-
+class CartTotalSerializer(ModelSerializer):
+    class Meta:
+        model=Order
+        fields=['total_quantity_of_product_in_order']
 
 class WishListSerializer(ModelSerializer):
     products = ProductSerializers(many =True, read_only = True)
@@ -126,3 +121,13 @@ class WishListSerializer(ModelSerializer):
     class Meta:
         model = WishList
         fields = ['code','user','products', 'new_price_sum_total','price_sum_total','private']
+
+class AddressSerializer(ModelSerializer):
+    class Meta:
+        model = Address
+        fields=['house_number','street','city','State','zip_code','country','apartment_address']
+
+class ShippingAddressSerializer(ModelSerializer):
+    class Meta:
+        model = ShippingAddress
+        fields=['house_number','street','city','State','zip_code','country','apartment_address']

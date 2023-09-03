@@ -170,7 +170,7 @@ class Order(models.Model):
         return super(Order, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'Order with token {self.order_token}'
+        return f'Order by {self.user}'
     
 
 
@@ -187,17 +187,51 @@ class OrderProduct(models.Model):
 
     @property
     def total_cost_of_product(self):
-        total = self.product.price * self.quantity
+        total = self.product.new_price * self.quantity
         return int(total)
    
     def __str__(self):
-        return f"item order {self.id} in cart"
+        return f"item order {self.order.user} in cart"
  
 
 
     
 
+
+
+class ShippingAddress(models.Model):
+    user =  models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
+    house_number = models.CharField( max_length=1000)
+    street = models.CharField( max_length=1000)
+    city = models.CharField( max_length=1000)
+    State = models.CharField( max_length=1000)
+    zip_code = models.CharField( max_length=1000)
+    country = CountryField(multiple = False)
+    apartment_address = models.CharField( max_length=1000)
+    # country = CountryField(multiple = False)
+
+    def __str__(self):
+        return f'{self.user} shipping address'
+    
+    
+class Address(models.Model):
+    user =  models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
+    house_number = models.CharField( max_length=1000)
+    street = models.CharField( max_length=1000)
+    city = models.CharField( max_length=1000)
+    State = models.CharField( max_length=1000)
+    zip_code = models.CharField( max_length=1000)
+    country = CountryField(multiple = False)
+    apartment_address = models.CharField( max_length=1000)
+    # country = CountryField(multiple = False)
+
+    def __str__(self):
+        return f'{self.user} shipping address'
+     
+
+
 class WishList(models.Model):
+    address = models.OneToOneField(ShippingAddress,null=True, blank=True, on_delete=models.SET_NULL)
     code = models.CharField( max_length=4, null = True, blank = True)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE , null = True, blank = True, related_name='userwishlist')
     products = models.ManyToManyField(Product)
@@ -217,22 +251,3 @@ class WishList(models.Model):
 
     def __str__(self):
         return f'{self.user} wishlist'
-
-
-
-class ShippingAddress(models.Model):
-    user =  models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
-    house_number = models.CharField( max_length=1000)
-    street = models.CharField( max_length=1000)
-    city = models.CharField( max_length=1000)
-    State = models.CharField( max_length=1000)
-    zip_code = models.CharField( max_length=1000)
-    country = CountryField(multiple = False)
-    apartment_address = models.CharField( max_length=1000)
-    # country = CountryField(multiple = False)
-
-    def __str__(self):
-        return f'{self.user} shipping address'
-    
-    
-    

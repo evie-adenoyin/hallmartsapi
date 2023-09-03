@@ -22,11 +22,13 @@ from .serializers import (
     UserProfileSerializer,
     UserRegistrationSerializer,
     UserOrderAnalyticsSerializer,
-    UserSerializer
+    UserSerializer,
+    UserAddressSerializer
                 )
 
 from .models import (
-               UserProfile
+               UserProfile,
+               UserAddress
                 )
 
 from .permissions import UserObjectPermission
@@ -39,16 +41,10 @@ class UserRegistrationApiView(APIView):
 
     def post(self, request):
         data = request.data
-        
         serializer = UserRegistrationSerializer(data = data)
-      
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True): 
             serializer.save()
-            print("serializer: ", serializer.validated_data)
             return Response(serializer.data, status =status.HTTP_201_CREATED)
-        else:
-            print("serializer: ", serializer)
-            print("Didn't save user")
         return Response(serializer.errors)
 
 
@@ -68,5 +64,29 @@ class UserAPIView(RetrieveUpdateAPIView):
             serializer = UserProfileSerializer(profile, context={'request': request})
             return Response(serializer.data, status = status.HTTP_200_OK)
         return Response({"message":"No profile found with this user."}, status = status.HTTP_404_NOT_FOUND)
+    
+    def post(self,request):
+        user = request.user
+        data = request.data
+      
+        try:
+            user_profile = UserProfile.objects.get( user__id=user.id)
+            user_address = UserAddress.objects.get( user=user_profile)
+            
+            serializer = UserAddressSerializer(user_address, data = data, context={'request': request})
+        except ObjectDoesNotExist:
+            return Response({"message":"No profile found with this user."}, status = status.HTTP_404_NOT_FOUND)
+       
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response({"message":"No profile found with this user."}, status = status.HTTP_404_NOT_FOUND)
+    
 
-   
+class PasswordChangeAPIView(APIView):
+
+    def post(self, request):
+        data = request.data
+        print(data)
+        return Response({"message":"Password updated."}, status = status.HTTP_200_OK)
