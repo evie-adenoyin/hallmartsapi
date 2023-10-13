@@ -53,7 +53,10 @@ from .serializers import(
 from rest_framework.permissions import IsAuthenticated
 
 
+
+
 # from rest_framework_simplejwt.authentication import JWTStatelessUserAuthentication
+
 
 
 # DONE : ALl category API

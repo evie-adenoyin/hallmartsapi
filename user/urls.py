@@ -10,5 +10,5 @@ app_name = 'user'
 urlpatterns = [
     path('registration', UserRegistrationApiView.as_view(), name = 'user-registration'),
     path('account/profile', UserAPIView.as_view(), name = "user-account"),
-    path('change-password', PasswordChangeAPIView.as_view(), name = "change-password"),
+    path('change/password', PasswordChangeAPIView.as_view(), name = "change-password"),
 ]

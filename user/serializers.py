@@ -52,7 +52,7 @@ class UserSerializer(ModelSerializer):
 class UserAddressSerializer(ModelSerializer):
     class Meta:
         model = UserAddress
-        fields = ['city', 'state', 'country','home', 'phone']
+        fields = ['city', 'state','home', 'phone']
 
 
 class UserProfileSerializer(ModelSerializer):

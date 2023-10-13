@@ -28,7 +28,8 @@ from .serializers import (
 
 from .models import (
                UserProfile,
-               UserAddress
+               UserAddress,
+             
                 )
 
 from .permissions import UserObjectPermission
@@ -55,7 +56,7 @@ class UserAPIView(RetrieveUpdateAPIView):
 
     def get(self,request):
         user= request.user
-       
+        
         try:
             profile = UserProfile.objects.get( user__id=user.id)
         except ObjectDoesNotExist:
@@ -68,10 +69,11 @@ class UserAPIView(RetrieveUpdateAPIView):
     def post(self,request):
         user = request.user
         data = request.data
+        print(user.id)
       
         try:
             user_profile = UserProfile.objects.get( user__id=user.id)
-            user_address = UserAddress.objects.get( user=user_profile)
+            user_address,create = UserAddress.objects.get_or_create( user=user_profile)
             
             serializer = UserAddressSerializer(user_address, data = data, context={'request': request})
         except ObjectDoesNotExist:
@@ -88,5 +90,12 @@ class PasswordChangeAPIView(APIView):
 
     def post(self, request):
         data = request.data
-        print(data)
-        return Response({"message":"Password updated."}, status = status.HTTP_200_OK)
+        user = User.objects.get(id = request.user.id)
+        password = user.check_password(data['oldpassword'])
+        if password:
+            user.set_password(data['newpassword'])
+            user.save()
+            return Response({"message":"Password updated."}, status = status.HTTP_200_OK)
+        return Response({"message":"Old password is incorrect."}, status = status.HTTP_400_BAD_REQUEST)
+    
+        

@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 
 # Third Party Apps 
-from decouple import config 
+from decouple import config
 import django_heroku
 
 
@@ -15,16 +15,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config('SECRET_KEY')
-SECRET_KEY = "config('SECRET_KEY')"
+
+SECRET_KEY = config('SECRET_KEY')
 EMAIL_SERVER_API_KEY = config('EMAIL_SERVER_API_KEY')
 
 DEBUG = config('DEBUG', cast = bool )
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost:3000']
 
+# ALLOWED HOST Config 
+ALLOWED_HOSTS = ['localhost:3000',  "https://hallmarts-green.vercel.app",]
+CORS_ALLOWED_ORIGINS = [
+    "https://hallmarts-green.vercel.app",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
 
 # Application definition
 
@@ -35,6 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third-party apps for media files 
+    'cloudinary_storage',
+    'cloudinary',
 
     #3rd party apps
     'rest_framework',
@@ -88,9 +107,22 @@ REST_FRAMEWORK = {
     
 }
 
-# Default SIMPLE_JWT config 
-# JWT_SIGNING_KEY = config('JWT_SIGNING_KEY')
-JWT_SIGNING_KEY =" config('JWT_SIGNING_KEY')"
+
+
+# Media Config 
+# CLOUDINARY_STORAGE SETTINGS 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME' ),
+    'API_KEY': config('CLOUDINARY_API_KEY' ),
+    'API_SECRET': config('CLOUDINARY_API_SECRET' )
+}
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+
+#SIMPLE_JWT config 
+JWT_SIGNING_KEY =config('JWT_SIGNING_KEY')
 SIMPLE_JWT ={
     'ACCESS_TOKEN_LIFETIME': timedelta(days=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
@@ -201,7 +233,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
-# STATIC_URL = '/static/'
 STACTICFILES_DIRS = [ BASE_DIR/ 'staticfiles' ]
 
 
@@ -211,37 +242,9 @@ STACTICFILES_DIRS = [ BASE_DIR/ 'staticfiles' ]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Media files 
-MEDIA_URL = '/media/'
-
-
-# if DEBUG:
 MEDIA_ROOT = BASE_DIR / 'product-image'
-# else:
-# # AWS 3 Bucket Config
-# AWS_ACCESS_KEY_ID =  config('AWS_ACCESS_KEY_ID')
-# AWS_SECRET_ACCESS_KEY =  config('AWS_SECRET_KEY')
-# AWS_STORAGE_BUCKET_NAME =config('AWS_BUCKET_NAME')
-# AWS_S3_REGION_NAME = 'us-east-2'
-# AWS_S3_FILE_OVERWRITE = False
-# AWS_DEFAULT_ACL = None
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+
 
 django_heroku.settings(locals())
-
-
-
-CORS_ALLOWED_ORIGINS = [
-    "https://hallmarts.vercel.app",
-]
-
-CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
