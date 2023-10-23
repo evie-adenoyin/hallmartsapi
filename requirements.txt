@@ -38,6 +38,7 @@ oauthlib==3.2.2
 Pillow==9.2.0
 platformdirs==2.5.2
 psycopg2==2.9.3
+psycopg2-binary==2.9.9
 pycparser==2.21
 PyJWT==2.4.0
 pyOpenSSL==20.0.1
