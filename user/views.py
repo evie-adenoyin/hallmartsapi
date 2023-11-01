@@ -61,7 +61,7 @@ class UserRegistrationApiView(APIView):
             
             print("token :", token)
             relative_link = reverse('user:verify-email')
-            absurl = 'http://'+current_site+relative_link+"?token="+str(token)
+            absurl = 'https://'+current_site+relative_link+"?token="+str(token)
             print("url link: ", absurl)
             email_body = 'Hi '+valid_user_info['username'] + \
                 ' Use the link below to verify your email \n' + absurl
