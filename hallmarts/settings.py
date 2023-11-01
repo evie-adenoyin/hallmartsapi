@@ -187,6 +187,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'hallmarts.wsgi.application'
 
 
+# Temp email backend config 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ekonge903@gmail.com'
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD' ) #past the key or password app here
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
