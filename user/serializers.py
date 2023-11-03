@@ -77,7 +77,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return {
             "token": str(token.access_token),
             "user_info": {
-                "id": user.id,
+              
                 "username": user.username,
                 "email": user.email,
                 "last_login": user.last_login,
