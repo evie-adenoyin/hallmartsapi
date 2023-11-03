@@ -57,10 +57,6 @@ class UserRegistrationApiView(APIView):
             user_id = User.objects.get(id=valid_user_info['id'])
             token = RefreshToken.for_user(user_id).access_token
 
-             # send email for user verification
-            current_site = get_current_site(request)
-           
-            
             relative_link = reverse('user:verify-email')
             absurl = CORS_ALLOWED_ORIGINS+relative_link+"/"+user_id.email+"?token="+str(token)
             print("email link: ", absurl)
@@ -92,7 +88,7 @@ class UserEmailVerificationAPIView(APIView):
                 return Response({"message": f"No user found with email {user.email}."}, status =status.HTTP_201_CREATED)
         user.email_verified = True
         user.save()
-        return Response({"message": f"Your email has been verified"}, status =status.HTTP_201_CREATED)
+        return Response({"message": f"Your email {user.email} has been verified"}, status =status.HTTP_201_CREATED)
      
      
 
