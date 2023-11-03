@@ -3,7 +3,7 @@ import jwt
 from django.urls import reverse
 from django.http import  HttpResponseRedirect
 
-
+from django.conf import settings
 from django.core import exceptions
 # DRF imports
 from rest_framework.response import Response
@@ -46,8 +46,9 @@ class UserRegistrationApiView(APIView):
     def post(self, request):
         data = request.data
         serializer = UserRegistrationSerializer(data = data)
+        CORS_ALLOWED_ORIGINS = settings.CORS_ALLOWED_ORIGINS[0]
         
-        
+      
         if serializer.is_valid(raise_exception=True): 
             serializer.save()
             
@@ -57,17 +58,16 @@ class UserRegistrationApiView(APIView):
             token = RefreshToken.for_user(user_id).access_token
 
              # send email for user verification
-            current_site = get_current_site(request).domain
+            current_site = get_current_site(request)
+           
             
-            print("token :", token)
             relative_link = reverse('user:verify-email')
-            absurl = 'https://'+current_site+relative_link+"?token="+str(token)
-            print("url link: ", absurl)
+            absurl = CORS_ALLOWED_ORIGINS+relative_link+"/"+user_id.email+"?token="+str(token)
+            print("email link: ", absurl)
+           
             email_body = 'Hi '+valid_user_info['username'] + \
                 ' Use the link below to verify your email \n' + absurl
-            email_data = {'email_body': email_body, 'to_email': valid_user_info['email'],
-                    'email_subject': 'Verify your email'}
-            
+          
             send_mail(
                 "Email verification",
                 email_body,
@@ -83,16 +83,17 @@ class UserRegistrationApiView(APIView):
     
 class UserEmailVerificationAPIView(APIView):
      
-     def get(self, request):
-        token = request.GET.get('token')
+    def post(self, request):
+        token = request.data['token'] 
         decode_token = jwt.decode(token, algorithms='HS256', options={"verify_signature": False})
         try:
             user = User.objects.get(id = decode_token['user_id'])
         except exceptions.ObjectDoesNotExist:
-             return Response({"message": f"No user found with email {user.email}."}, status =status.HTTP_201_CREATED)
+                return Response({"message": f"No user found with email {user.email}."}, status =status.HTTP_201_CREATED)
         user.email_verified = True
         user.save()
-        return Response({"message": f"Your email {user.email} has been verified"}, status =status.HTTP_201_CREATED)
+        return Response({"message": f"Your email has been verified"}, status =status.HTTP_201_CREATED)
+     
      
 
 class LoginAPIView(APIView):
