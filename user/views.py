@@ -47,20 +47,17 @@ class UserRegistrationApiView(APIView):
         data = request.data
         serializer = UserRegistrationSerializer(data = data)
         CORS_ALLOWED_ORIGINS = settings.CORS_ALLOWED_ORIGINS[0]
-        
       
         if serializer.is_valid(raise_exception=True): 
             serializer.save()
-            
+
             # getting tokens
             valid_user_info = serializer.data
             user_id = User.objects.get(id=valid_user_info['id'])
             token = RefreshToken.for_user(user_id).access_token
-
             relative_link = reverse('user:verify-email')
-            absurl = CORS_ALLOWED_ORIGINS+relative_link+"/"+user_id.email+"?token="+str(token)
-            print("email link: ", absurl)
-           
+            absurl = CORS_ALLOWED_ORIGINS+relative_link+"/"+user_id.email+"?token="+str(token)  
+
             email_body = 'Hi '+valid_user_info['username'] + \
                 ' Use the link below to verify your email \n' + absurl
           
@@ -71,9 +68,7 @@ class UserRegistrationApiView(APIView):
                 [valid_user_info['email']],
                 fail_silently=False,
 )
-            
             return Response(serializer.data, status =status.HTTP_201_CREATED)
-
         return Response(serializer.errors)
   
     
@@ -104,18 +99,17 @@ class LoginAPIView(APIView):
 
 class UserAPIView(RetrieveUpdateAPIView):
     # permission_classes = [UserObjectPermission]
-    # serializer_class = UserProfileSerializer
+    serializer_class = UserSerializer
     # queryset = UserProfile.objects.all()
 
     def get(self,request):
         user_req= request.user
-        
         try:
             user = User.objects.get( id=user_req.id)
         except exceptions.ObjectDoesNotExist:
             return Response({"message":"No user found with this user."}, status = status.HTTP_404_NOT_FOUND)
         if user:
-            serializer = UserSerializer(user, context={'request': request})
+            serializer = self.serializer_class(user, context={'request': request})
             return Response(serializer.data, status = status.HTTP_200_OK)
         return Response({"message":"No user found with this user."}, status = status.HTTP_404_NOT_FOUND)
     
@@ -126,7 +120,7 @@ class UserAPIView(RetrieveUpdateAPIView):
       
         try:
             user = User.objects.get( id=user.id)
-            serializer = UserSerializer(user, data = data, context={'request': request})
+            serializer = self.serializer_class(user, data = data, context={'request': request})
         except exceptions.ObjectDoesNotExist:
             return Response({"message":"No user found."}, status = status.HTTP_404_NOT_FOUND)
        
