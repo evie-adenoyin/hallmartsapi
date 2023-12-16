@@ -1,4 +1,5 @@
 from django.contrib import auth
+from django.utils import timezone
 
 from rest_framework import serializers  
 from rest_framework import exceptions
@@ -66,18 +67,15 @@ class LoginSerializer(serializers.ModelSerializer):
         return attrs
 
     def get_token(self, email: str) -> dict:
-        # inline imports
-        from datetime import datetime
-
+      
         user: User = User.objects.filter(email=email.lower()).first()
-        user.last_login = datetime.now()
+        user.last_login = timezone.now()
         user.save(update_fields=["last_login"])
 
         token: RefreshToken = self.for_user(user)
         return {
             "token": str(token.access_token),
             "user_info": {
-              
                 "username": user.username,
                 "email": user.email,
                 "last_login": user.last_login,

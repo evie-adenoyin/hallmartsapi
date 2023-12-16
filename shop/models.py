@@ -78,7 +78,7 @@ class Product(models.Model):
     new_price = models.IntegerField(default=0)
     discount_percentage = models.FloatField(default=0)
     stock = models.IntegerField(default=1)
-    image_1 = models.ImageField(upload_to='images/')
+    image_1 = models.ImageField(upload_to='images/' ,null = True, blank = True)
     image_2 = models.ImageField(upload_to='images/', null = True, blank = True)
     image_3 = models.ImageField(upload_to='images/', null = True, blank = True)
     category= models.ManyToManyField(to=Category, related_name='categories')
