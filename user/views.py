@@ -80,10 +80,11 @@ class UserEmailVerificationAPIView(APIView):
         try:
             user = User.objects.get(id = decode_token['user_id'])
         except exceptions.ObjectDoesNotExist:
-                return Response({"message": f"No user found with email {user.email}."}, status =status.HTTP_201_CREATED)
-        user.email_verified = True
-        user.save()
-        return Response({"message": f"Your email {user.email} has been verified"}, status =status.HTTP_201_CREATED)
+                return Response({"message": f"Invalid user email."}, status =status.HTTP_201_CREATED)
+        if user:
+            user.email_verified = True
+            user.save()
+            return Response({"message": f"Your email {user.email} has been verified"}, status =status.HTTP_201_CREATED)
      
      
 
